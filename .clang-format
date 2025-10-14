@@ -1,0 +1,6 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# https://google.github.io/styleguide/cppguide.html
+# clang-format -i rougeedll.cpp rougee.cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+Language: Cpp

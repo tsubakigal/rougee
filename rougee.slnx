@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="rougeedll.vcxproj" Id="9bcdd9bf-f10b-4d01-ab2a-63b6bdf314ba" />
+  <Project Path="rougee.vcxproj" Id="b9faa4e6-8559-4bc2-8abf-cb0f1cb9c022" />
+</Solution>
