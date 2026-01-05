@@ -12,13 +12,16 @@ on:
     workflow_dispatch:
 
 env:
-    # Path to the solution file relative to the root of the project.
+    # Path to the solution file or folder relative to the root of the project.
     SOLUTION_FILE_PATH: .
 
     # Configuration type to build.
     # You can convert this to a build matrix if you need coverage of multiple configuration types.
     # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     BUILD_CONFIGURATION: Release
+
+    # Visual Studio version to use (adjustable). Set to VS2026 as requested.
+    VS_VERSION: "2026"
 
 permissions:
     contents: read
@@ -32,10 +35,19 @@ jobs:
               with:
                   submodules: recursive
 
-            - name: Setup MSBuild (VS2026)
+            - name: Setup MSBuild (VS ${{ env.VS_VERSION }})
               uses: microsoft/setup-msbuild@v2
               with:
-                  vs-version: "2026"
+                  vs-version: ${{ env.VS_VERSION }}
 
             - name: Build .slnx Solution
-              run: msbuild rougee.slnx /p:Configuration=Release
+              shell: pwsh
+              run: |
+                $solution = "${{ env.SOLUTION_FILE_PATH }}/rougee.slnx"
+                if (-not (Test-Path $solution)) {
+                  Write-Host "Solution file not found at $solution"
+                  Write-Host "Listing files in ${{ env.SOLUTION_FILE_PATH }}:"
+                  Get-ChildItem -Path "${{ env.SOLUTION_FILE_PATH }}" -Force
+                  exit 1
+                }
+                msbuild $solution /p:Configuration=${{ env.BUILD_CONFIGURATION }}
