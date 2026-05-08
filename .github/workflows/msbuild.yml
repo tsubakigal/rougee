@@ -1,53 +1,51 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: MSBuild
 
 on:
-    push:
-        tags:
-            - "v*"
-    workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
 
 env:
-    # Path to the solution file or folder relative to the root of the project.
-    SOLUTION_FILE_PATH: .
-
-    # Configuration type to build.
-    # You can convert this to a build matrix if you need coverage of multiple configuration types.
-    # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    BUILD_CONFIGURATION: Release
-
-    # Visual Studio version to use (adjustable). Set to VS2026 as requested.
-    VS_VERSION: "2026"
+  SOLUTION_FILE_PATH: .
+  BUILD_CONFIGURATION: Release
 
 permissions:
-    contents: read
+  contents: read
 
 jobs:
-    build:
-        runs-on: windows-latest
-        steps:
-            - name: Checkout code (with submodules)
-              uses: actions/checkout@v4
-              with:
-                  submodules: recursive
+  build:
+    runs-on: windows-2025
 
-            - name: Setup MSBuild (VS ${{ env.VS_VERSION }})
-              uses: microsoft/setup-msbuild@v2
-              with:
-                  vs-version: ${{ env.VS_VERSION }}
+    steps:
+      - name: Checkout code (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-            - name: Build .slnx Solution
-              shell: pwsh
-              run: |
-                $solution = "${{ env.SOLUTION_FILE_PATH }}/rougee.slnx"
-                if (-not (Test-Path $solution)) {
-                  Write-Host "Solution file not found at $solution"
-                  Write-Host "Listing files in ${{ env.SOLUTION_FILE_PATH }}:"
-                  Get-ChildItem -Path "${{ env.SOLUTION_FILE_PATH }}" -Force
-                  exit 1
-                }
-                msbuild $solution /p:Configuration=${{ env.BUILD_CONFIGURATION }}
+      - name: Setup MSBuild (VS2026)
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: "[18.0,19.0)"
+
+      - name: Show Visual Studio Info
+        shell: pwsh
+        run: |
+          vswhere -latest
+          msbuild -version
+
+      - name: Build .slnx Solution
+        shell: pwsh
+        run: |
+          $solution = "${{ env.SOLUTION_FILE_PATH }}/rougee.slnx"
+
+          if (-not (Test-Path $solution)) {
+            Write-Host "Solution file not found at $solution"
+            Write-Host "Listing files in ${{ env.SOLUTION_FILE_PATH }}:"
+            Get-ChildItem -Path "${{ env.SOLUTION_FILE_PATH }}" -Force
+            exit 1
+          }
+
+          msbuild $solution `
+            /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
+            /m
