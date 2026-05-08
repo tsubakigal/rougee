@@ -26,7 +26,7 @@ jobs:
       - name: Setup MSBuild (VS2026)
         uses: microsoft/setup-msbuild@v2
         with:
-          vs-version: "[18.0,19.0)"
+          vs-version: "18.0"  # 明确指定 VS2026（17.x 是 VS2022）
 
       - name: Show Visual Studio Info
         shell: pwsh
@@ -48,4 +48,5 @@ jobs:
 
           msbuild $solution `
             /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
+            /p:Platform=x64 `
             /m
