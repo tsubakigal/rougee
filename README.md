@@ -5,6 +5,7 @@
 ## 编译步骤
 ```sh
 git clone https://github.com/tsubakigal/rougee.git
+cd rougee
 git submodule update --init --recursive --depth 1
 cmake -B build -A win32
 cmake --build build --config Release
